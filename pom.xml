@@ -33,6 +33,7 @@
     </licenses>
 
     <modules>
+        <module>assertion</module>
         <module>jdbc</module>
         <module>salesforce</module>
         <module>mongodb</module>
