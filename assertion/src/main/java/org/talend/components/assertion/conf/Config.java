@@ -12,51 +12,117 @@
  */
 package org.talend.components.assertion.conf;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.talend.components.assertion.service.DateValidator;
 import org.talend.sdk.component.api.configuration.Option;
-import org.talend.sdk.component.api.configuration.action.Suggestable;
-import org.talend.sdk.component.api.configuration.action.Updatable;
-import org.talend.sdk.component.api.configuration.condition.ActiveIf;
+import org.talend.sdk.component.api.configuration.constraint.Required;
 import org.talend.sdk.component.api.configuration.type.DataStore;
+import org.talend.sdk.component.api.configuration.ui.DefaultValue;
+import org.talend.sdk.component.api.configuration.ui.OptionsOrder;
 import org.talend.sdk.component.api.configuration.ui.layout.GridLayout;
 import org.talend.sdk.component.api.meta.Documentation;
-import org.talend.sdk.component.api.meta.Documentation;
 import org.talend.sdk.component.api.configuration.type.DataSet;
+import org.talend.sdk.component.api.record.Schema;
 
-import org.talend.sdk.component.api.configuration.Option;
 import java.io.Serializable;
+import java.util.List;
 
 @Data
-@GridLayout({ @GridLayout.Row({ "dse" }) })
-@GridLayout(names = GridLayout.FormType.ADVANCED, value = {})
+@GridLayout({ @GridLayout.Row({ "dse" }), @GridLayout.Row({ "dateFormat" }), @GridLayout.Row({ "assertions" }) })
 public class Config implements Serializable {
 
-	@Option
-	@Documentation("")
-	MyDataset dse;
+    // @TODO : should remove datastore/dataset, the connector shoudl be a simple processor
+    @Option
+    @Documentation("")
+    AssertDSE dse;
 
-	@GridLayout({@GridLayout.Row({ "test" })})
-	@GridLayout(names = GridLayout.FormType.ADVANCED, value = {})
-	@Data
-	@DataSet("Dataset")
-	public static class MyDataset implements Serializable {
+    @Option
+    @Documentation("")
+    @DefaultValue(DateValidator.DEFAULT_DATE_FORMAT)
+    String dateFormat = DateValidator.DEFAULT_DATE_FORMAT;
 
-		@Option
-		@Documentation("")
-		MyDatastore test;
+    @Option
+    @Required
+    @Documentation("List of assertions.")
+    List<AssertEntry> assertions;
 
-	}
+    @GridLayout({ @GridLayout.Row({ "dso" }) })
+    @Data
+    @DataSet("assertion_dse")
+    public static class AssertDSE implements Serializable {
 
-	@GridLayout({@GridLayout.Row({ "aaa" })})
-	@GridLayout(names = GridLayout.FormType.ADVANCED, value = {})
-	@Data
-	@DataStore("Datastore")
-	public static class MyDatastore implements Serializable {
+        @Option
+        @Documentation("")
+        AssertDSO dso;
 
-		@Option
-		@Documentation("")
-		String aaa;
+    }
 
-	}
+    @GridLayout({})
+    @DataStore("assertion_dso")
+    public static class AssertDSO implements Serializable {
+
+    }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @OptionsOrder({ "path", "clazz", "type", "condition", "value", "err_message" })
+    @Documentation("Assertion description entry.")
+    public static class AssertEntry implements Serializable {
+
+        @Option
+        @Required
+        @Documentation("Path of the element to test.")
+        private String path;
+
+        @Option
+        @Required
+        @Documentation("Check the expected type.")
+        private Type type;
+
+        @Option
+        @Required
+        @Documentation("Value TCK Type.")
+        private String clazz;
+
+        @Option
+        @Required
+        @Documentation("Check the expected type.")
+        private Condition condition;
+
+        @Option
+        @Required
+        @Documentation("The expected value.")
+        private String value;
+
+        @Option
+        @Required
+        @Documentation("The error message")
+        private String err_message;
+
+        @Override
+        public String toString() {
+            return "* " + err_message + " : \n" + path + " of type " + clazz + "/" + type + " was tested on " + condition
+                    + " with expected value '" + value + "'";
+        }
+
+    }
+
+    public enum Condition {
+        EQUALS,
+        INFERIOR,
+        SUPERIOR,
+        CONTAINS,
+        IS_NULL
+    }
+
+    public enum Type {
+        STRING,
+        BOOLEAN,
+        NUMBER,
+        DATE
+    }
 
 }

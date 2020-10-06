@@ -17,16 +17,17 @@ import org.talend.sdk.component.api.component.Version;
 import org.talend.sdk.component.api.component.Icon;
 import org.talend.sdk.component.api.meta.Documentation;
 import org.talend.components.assertion.conf.Config;
-import org.talend.components.assertion.service.Service;
+import org.talend.components.assertion.service.AssertService;
 
 import java.io.Serializable;
+import java.util.List;
+import java.util.stream.Collectors;
 
-import org.talend.sdk.component.api.processor.AfterGroup;
-import org.talend.sdk.component.api.processor.BeforeGroup;
 import org.talend.sdk.component.api.processor.ElementListener;
 import org.talend.sdk.component.api.processor.Processor;
 import org.talend.sdk.component.api.record.Record;
 import org.talend.sdk.component.api.configuration.Option;
+import org.talend.sdk.component.api.record.RecordPointerFactory;
 
 @Slf4j
 @Version(1)
@@ -37,17 +38,22 @@ public class Assertion implements Serializable {
 
     private final Config config;
 
-    private Service service;
+    private AssertService service;
 
     private transient boolean done = false;
 
-    public Assertion(@Option("configuration") final Config config, final Service service) {
+    public Assertion(@Option("configuration") final Config config, final AssertService service) {
         this.service = service;
         this.config = config;
     }
 
     @ElementListener
     public void doAssert(final Record in) {
+        final List<String> validates = service.validate(this.config, in);
+        if (validates.size() > 0) {
+            final String collect = validates.stream().collect(Collectors.joining("\n"));
+            throw new RuntimeException(collect);
+        }
     }
 
 }
