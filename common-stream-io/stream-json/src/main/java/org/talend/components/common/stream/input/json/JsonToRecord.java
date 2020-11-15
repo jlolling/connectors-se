@@ -13,7 +13,9 @@
 package org.talend.components.common.stream.input.json;
 
 import java.math.BigDecimal;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -34,21 +36,33 @@ import static java.util.stream.Collectors.toSet;
 
 public class JsonToRecord {
 
+    public final static String DEFAULT_DATE_FORMAT = "yyyy/MM/dd HH:mm:ssX";
+
+    public final static DateTimeFormatter dtf = DateTimeFormatter.ofPattern(DEFAULT_DATE_FORMAT).withZone(ZoneId.of("UTC"));
+
     private final RecordBuilderFactory factory;
 
     private final NumberOption numberOption;
+
+    private final boolean typeAsPrefix;
 
     public JsonToRecord(final RecordBuilderFactory factory) {
         this(factory, false);
     }
 
     public JsonToRecord(RecordBuilderFactory factory, boolean forceNumberAsDouble) {
+        this(factory, forceNumberAsDouble, false);
+    }
+
+    public JsonToRecord(RecordBuilderFactory factory, boolean forceNumberAsDouble, boolean typeAsPrefix) {
         this.factory = factory;
         if (forceNumberAsDouble) {
             this.numberOption = NumberOption.ForceDoubleType;
         } else {
             this.numberOption = NumberOption.InferType;
         }
+
+        this.typeAsPrefix = typeAsPrefix;
     }
 
     /*
@@ -78,7 +92,12 @@ public class JsonToRecord {
                 builder.withBoolean(key, JsonValue.TRUE.equals(value));
                 break;
             case STRING:
-                builder.withString(key, JsonString.class.cast(value).getString());
+                final String s = JsonString.class.cast(value).getString();
+                if (typeAsPrefix && s.startsWith("__")) {
+                    forceType(builder, key, s);
+                } else {
+                    builder.withString(key, s);
+                }
                 break;
             case NUMBER:
                 final JsonNumber number = JsonNumber.class.cast(value);
@@ -91,6 +110,60 @@ public class JsonToRecord {
             }
         });
         return builder.build();
+    }
+
+    private void forceType(final Record.Builder builder, final String key, final String value) {
+        final String substring = value.substring(2); // remove prefix "__"
+        final int i = substring.indexOf("__"); // search suffix "__"
+
+        if (i < 1) {
+            // no type defined
+            builder.withString(key, value);
+            return;
+        }
+
+        final String stype = substring.substring(0, i);
+        final String content = substring.substring(i + 2);
+
+        final Schema.Type type = Schema.Type.valueOf(stype);
+        switch (type) {
+        case BYTES:
+            final byte[] bytes = hexStringToByteArray(content);
+            builder.withBytes(key, bytes);
+            break;
+        case INT:
+            builder.withInt(key, Integer.valueOf(content));
+            break;
+        case LONG:
+            builder.withLong(key, Long.valueOf(content));
+            break;
+        case FLOAT:
+            builder.withFloat(key, Float.valueOf(content));
+            break;
+        case DOUBLE:
+            builder.withDouble(key, Float.valueOf(content));
+            break;
+        case DATETIME:
+            ZonedDateTime zdt = ZonedDateTime.parse(content, dtf);
+            builder.withDateTime(key, zdt);
+            break;
+        default:
+            throw new RuntimeException("The given type is not supported : " + type);
+        }
+    }
+
+    public static byte[] hexStringToByteArray(String s) {
+        int len = s.length();
+
+        if (len % 2 != 0) {
+            throw new RuntimeException("Expected bytes array is wrong. It should have an even length : " + s);
+        }
+
+        byte[] data = new byte[len / 2];
+        for (int i = 0; i < len; i += 2) {
+            data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4) + Character.digit(s.charAt(i + 1), 16));
+        }
+        return data;
     }
 
     private Object mapJson(final JsonValue it) {

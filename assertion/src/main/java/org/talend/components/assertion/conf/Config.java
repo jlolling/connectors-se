@@ -27,13 +27,14 @@ import org.talend.sdk.component.api.configuration.type.DataSet;
 import org.talend.sdk.component.api.record.Schema;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
 @GridLayout({ @GridLayout.Row({ "dse" }), @GridLayout.Row({ "dateFormat" }), @GridLayout.Row({ "assertions" }) })
 public class Config implements Serializable {
 
-    // @TODO : should remove datastore/dataset, the connector shoudl be a simple processor
+    // @TODO : should remove datastore/dataset, the connector should be a simple processor
     @Option
     @Documentation("")
     AssertDSE dse;
@@ -65,10 +66,18 @@ public class Config implements Serializable {
 
     }
 
+    public void addAssertEntry(AssertEntry e) {
+        if (this.assertions == null) {
+            this.assertions = new ArrayList<>();
+        }
+
+        this.assertions.add(e);
+    }
+
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
-    @OptionsOrder({ "path", "clazz", "type", "condition", "value", "err_message" })
+    @OptionsOrder({ "path", "type", "condition", "value", "err_message" })
     @Documentation("Assertion description entry.")
     public static class AssertEntry implements Serializable {
 
@@ -80,12 +89,7 @@ public class Config implements Serializable {
         @Option
         @Required
         @Documentation("Check the expected type.")
-        private Type type;
-
-        @Option
-        @Required
-        @Documentation("Value TCK Type.")
-        private String clazz;
+        private Schema.Type type;
 
         @Option
         @Required
@@ -104,7 +108,7 @@ public class Config implements Serializable {
 
         @Override
         public String toString() {
-            return "* " + err_message + " : \n" + path + " of type " + clazz + "/" + type + " was tested on " + condition
+            return "* " + err_message + " : \n" + path + " of type " + type + " was tested on " + condition
                     + " with expected value '" + value + "'";
         }
 
@@ -115,14 +119,8 @@ public class Config implements Serializable {
         INFERIOR,
         SUPERIOR,
         CONTAINS,
-        IS_NULL
-    }
-
-    public enum Type {
-        STRING,
-        BOOLEAN,
-        NUMBER,
-        DATE
+        IS_NULL,
+        CUSTOM
     }
 
 }

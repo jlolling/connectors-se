@@ -15,10 +15,24 @@ package org.talend.components.assertion.service;
 import org.talend.components.assertion.conf.Config;
 import org.talend.sdk.component.api.record.Record;
 
-public class NullValidator extends Validator<Object> {
+import java.util.Arrays;
+
+public class BytesValidator extends Validator<byte[]> {
 
     @Override
-    public boolean validate(final Config.Condition condition, final String expected, final Object value, Record record) {
-        return value == null;
+    public boolean validate(Config.Condition condition, String expected, byte[] value, Record record) {
+        final byte[] bexpected = Util.hexStringToByteArray(expected);
+
+        switch (condition) {
+        case EQUALS:
+            return Arrays.equals(bexpected, value);
+        case CONTAINS:
+            final String sbytes = new String(value);
+            final String sexpected = new String(bexpected);
+            return sbytes.contains(sexpected);
+        default:
+            throw new UnsupportedOperationException("Unspported String condition : " + condition);
+        }
     }
+
 }

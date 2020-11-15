@@ -13,6 +13,9 @@
 package org.talend.components.common.stream.input.json;
 
 import java.io.StringReader;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 import javax.json.Json;
 import javax.json.JsonArray;
@@ -46,6 +49,8 @@ class JsonToRecordTest {
 
     private JsonToRecord toRecordDoubleOption;
 
+    private JsonToRecord toRecordForceType;
+
     @BeforeAll
     static void initLog() {
         System.setProperty("org.slf4j.simpleLogger.log.org.talend.components.common.stream", "debug");
@@ -55,7 +60,8 @@ class JsonToRecordTest {
     void start() {
         final RecordBuilderFactory recordBuilderFactory = new RecordBuilderFactoryImpl("test");
         this.toRecord = new JsonToRecord(recordBuilderFactory);
-        toRecordDoubleOption = new JsonToRecord(recordBuilderFactory, true);
+        this.toRecordDoubleOption = new JsonToRecord(recordBuilderFactory, true);
+        this.toRecordForceType = new JsonToRecord(recordBuilderFactory, false, true);
     }
 
     @Test
@@ -128,6 +134,40 @@ class JsonToRecordTest {
 
         final Entry aNumberEntryDouble = findEntry(recordDouble.getSchema(), "aNumber");
         Assertions.assertEquals(Schema.Type.DOUBLE, aNumberEntryDouble.getType());
+    }
+
+    @Test
+    void testForceType() {
+        String source = "{\"is_int\" : \"__INT__10\", \"is_long\" : \"__LONG__10\", \"is_float\" : \"__FLOAT__10\", \"is_double\" : \"__DOUBLE__10\", \"is_bytes\" : \"__BYTES__000102030A7F80FFFEFDF6\", \"is_datetime\" : \"__DATETIME__2020/10/01 00:06:00+02\"}";
+        JsonObject json = getJsonObject(source);
+        final Record record = toRecordForceType.toRecord(json);
+
+        final Entry is_int = findEntry(record.getSchema(), "is_int");
+        Assertions.assertEquals(Schema.Type.INT, is_int.getType());
+        Assertions.assertEquals(10, record.getInt("is_int"));
+
+        final Entry is_long = findEntry(record.getSchema(), "is_long");
+        Assertions.assertEquals(Schema.Type.LONG, is_long.getType());
+        Assertions.assertEquals(10L, record.getLong("is_long"));
+
+        final Entry is_float = findEntry(record.getSchema(), "is_float");
+        Assertions.assertEquals(Schema.Type.FLOAT, is_float.getType());
+        Assertions.assertEquals(10f, record.getFloat("is_float"));
+
+        final Entry is_double = findEntry(record.getSchema(), "is_double");
+        Assertions.assertEquals(Schema.Type.DOUBLE, is_double.getType());
+        Assertions.assertEquals(10d, record.getDouble("is_double"));
+
+        final Entry is_bytes = findEntry(record.getSchema(), "is_bytes");
+        Assertions.assertEquals(Schema.Type.BYTES, is_bytes.getType());
+        Assertions.assertArrayEquals(new byte[] { 0, 1, 2, 3, 10, 127, -128, -1, -2, -3, -10 }, record.getBytes("is_bytes"));
+
+        final Entry is_datetime = findEntry(record.getSchema(), "is_datetime");
+        Assertions.assertEquals(Schema.Type.DATETIME, is_datetime.getType());
+
+        final String DEFAULT_DATE_FORMAT = "yyyy/MM/dd HH:mm:ssX";
+        final DateTimeFormatter dtf = DateTimeFormatter.ofPattern(DEFAULT_DATE_FORMAT).withZone(ZoneId.of("UTC"));
+        Assertions.assertEquals(ZonedDateTime.parse("2020/10/01 00:06:00+02", dtf), record.getDateTime("is_datetime"));
     }
 
     private Entry findEntry(Schema schema, String entryName) {

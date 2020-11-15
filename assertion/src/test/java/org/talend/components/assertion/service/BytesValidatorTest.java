@@ -18,22 +18,26 @@ import org.talend.components.assertion.conf.Config;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class StringValidatorTest {
+class BytesValidatorTest {
 
-    private StringValidator validator;
+    private BytesValidator validator;
 
     @BeforeEach
     public void beforeEach() {
-        validator = new StringValidator();
+        validator = new BytesValidator();
     }
 
     @Test
     public void validate() {
-        String expected = "expected";
-        assertTrue(validator.validate(Config.Condition.EQUALS, expected, expected, null));
-        assertTrue(validator.validate(Config.Condition.CONTAINS, expected, "azerty" + expected + "uiop", null));
-        assertFalse(validator.validate(Config.Condition.EQUALS, expected, "azerty" + expected + "uiop", null));
-        assertFalse(validator.validate(Config.Condition.CONTAINS, expected, "azertyuiop", null));
+        String sbytearr = "000102030A7F80FFFEFDF6"; // [0, 1, 2, 3, 10, 127, -128, -1, -2, -3, -10]
+        final byte[] bytearr = Util.hexStringToByteArray(sbytearr);
+
+        assertTrue(validator.validate(Config.Condition.EQUALS, sbytearr, bytearr, null));
+        assertTrue(validator.validate(Config.Condition.CONTAINS, "0A7F80", bytearr, null));
+        assertTrue(validator.validate(Config.Condition.CONTAINS, "80FFFE", bytearr, null));
+
+        assertFalse(validator.validate(Config.Condition.EQUALS, "040302", new byte[] { 5, 4, 3, 2, 1 }, null));
+        assertFalse(validator.validate(Config.Condition.CONTAINS, "060403", new byte[] { 5, 4, 3, 2, 1 }, null));
     }
 
 }

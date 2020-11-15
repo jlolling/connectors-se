@@ -52,7 +52,7 @@ public class Assertion implements Serializable {
         final List<String> validates = service.validate(this.config, in);
         if (validates.size() > 0) {
             final String collect = validates.stream().collect(Collectors.joining("\n"));
-            throw new RuntimeException(collect);
+            throw new RuntimeException(AssertService.LOG_PREFIX + "\n" + collect);
         }
     }
 

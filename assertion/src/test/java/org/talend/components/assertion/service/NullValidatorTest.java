@@ -22,8 +22,8 @@ class NullValidatorTest {
     @Test
     public void validate() {
         NullValidator validator = new NullValidator();
-        assertTrue(validator.validate(Config.Condition.EQUALS, "", null));
-        assertFalse(validator.validate(Config.Condition.EQUALS, "", "not null"));
+        assertTrue(validator.validate(Config.Condition.EQUALS, "", null, null));
+        assertFalse(validator.validate(Config.Condition.EQUALS, "", "not null", null));
     }
 
 }

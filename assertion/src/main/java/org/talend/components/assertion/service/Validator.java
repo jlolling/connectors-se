@@ -12,10 +12,30 @@
  */
 package org.talend.components.assertion.service;
 
+import lombok.Data;
 import org.talend.components.assertion.conf.Config;
+import org.talend.components.common.stream.api.RecordIORepository;
+import org.talend.sdk.component.api.record.Record;
+import org.talend.sdk.component.api.record.RecordPointerFactory;
+import org.talend.sdk.component.api.service.record.RecordBuilderFactory;
+import org.talend.sdk.component.api.service.record.RecordService;
 
-public interface Validator<E> {
+import javax.json.JsonReaderFactory;
+import javax.json.stream.JsonParserFactory;
 
-    boolean validate(final Config.Condition condition, final String expected, final E value);
+@Data
+public abstract class Validator<E> {
+
+    public RecordPointerFactory recordPointerFactory;
+
+    public RecordBuilderFactory recordBuilderFactory;
+
+    public RecordService recordService;
+
+    private JsonReaderFactory jsonReaderFactory;
+
+    private JsonParserFactory jsonParserFactory;
+
+    abstract boolean validate(final Config.Condition condition, final String expected, final E value, final Record record);
 
 }

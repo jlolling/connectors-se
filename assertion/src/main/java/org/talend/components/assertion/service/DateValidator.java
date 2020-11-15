@@ -13,6 +13,7 @@
 package org.talend.components.assertion.service;
 
 import org.talend.components.assertion.conf.Config;
+import org.talend.sdk.component.api.record.Record;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -20,7 +21,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
-public class DateValidator implements Validator {
+public class DateValidator extends Validator {
 
     public final static String DEFAULT_DATE_FORMAT = "yyyy/MM/dd HH:mm:ssX";
 
@@ -28,7 +29,7 @@ public class DateValidator implements Validator {
     private DateTimeFormatter dtf = DateTimeFormatter.ofPattern(DEFAULT_DATE_FORMAT).withZone(ZoneId.of("UTC"));
 
     @Override
-    public boolean validate(Config.Condition condition, String expected, Object value) {
+    public boolean validate(Config.Condition condition, String expected, Object value, Record record) {
         ZonedDateTime zdtExpected = ZonedDateTime.parse(expected, dtf);
         ZonedDateTime zdtValue = null;
 

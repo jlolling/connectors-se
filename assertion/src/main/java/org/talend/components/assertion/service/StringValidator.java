@@ -13,11 +13,12 @@
 package org.talend.components.assertion.service;
 
 import org.talend.components.assertion.conf.Config;
+import org.talend.sdk.component.api.record.Record;
 
-public class StringValidator implements Validator<String> {
+public class StringValidator extends Validator<String> {
 
     @Override
-    public boolean validate(final Config.Condition condition, final String expected, final String value) {
+    public boolean validate(final Config.Condition condition, final String expected, final String value, Record record) {
         switch (condition) {
         case EQUALS:
             return expected.equals(value);

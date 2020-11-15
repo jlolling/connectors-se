@@ -14,6 +14,8 @@ package org.talend.components.assertion.service;
 
 import org.talend.components.assertion.conf.Config;
 
+import org.talend.sdk.component.api.record.Schema;
+
 public class ValidatorFactory {
 
     private ValidatorFactory() {
@@ -21,25 +23,40 @@ public class ValidatorFactory {
 
     public static Validator createInstance(final Config.AssertEntry asrt, String dateFormat) {
 
-        if (asrt.getCondition() == Config.Condition.IS_NULL) {
+        final Config.Condition condition = asrt.getCondition();
+        switch (condition) {
+        case IS_NULL:
             return new NullValidator();
+        case CUSTOM:
+            return new CustomValidator();
         }
 
-        final Config.Type type = asrt.getType();
-
+        final Schema.Type type = asrt.getType();
         switch (type) {
+        case RECORD:
+            return new RecordValidator();
+        case ARRAY:
+            return new ArrayValidator();
         case STRING:
             return new StringValidator();
+        case BYTES:
+            return new BytesValidator();
+        case INT:
+            return new IntegerValidator();
+        case LONG:
+            return new LongValidator();
+        case FLOAT:
+            return new DoubleValidator();
+        case DOUBLE:
+            return new DoubleValidator();
         case BOOLEAN:
             return new BooleanValidator();
-        case NUMBER:
-            return new NumberValidator();
-        case DATE:
+        case DATETIME:
             final DateValidator dateValidator = new DateValidator();
             dateValidator.setFormat(dateFormat);
             return dateValidator;
         default:
-            throw new UnsupportedOperationException("Can't validate type " + type);
+            throw new UnsupportedOperationException("Type to validate not supported : " + type);
         }
 
     }

@@ -29,10 +29,10 @@ class BooleanValidatorTest {
 
     @Test
     public void validate() {
-        assertTrue(validator.validate(Config.Condition.EQUALS, "True", Boolean.TRUE));
-        assertFalse(validator.validate(Config.Condition.EQUALS, "True", Boolean.FALSE));
-        assertTrue(validator.validate(Config.Condition.EQUALS, "False", Boolean.FALSE));
-        assertFalse(validator.validate(Config.Condition.EQUALS, "False", Boolean.TRUE));
+        assertTrue(validator.validate(Config.Condition.EQUALS, "True", Boolean.TRUE, null));
+        assertFalse(validator.validate(Config.Condition.EQUALS, "True", Boolean.FALSE, null));
+        assertTrue(validator.validate(Config.Condition.EQUALS, "False", Boolean.FALSE, null));
+        assertFalse(validator.validate(Config.Condition.EQUALS, "False", Boolean.TRUE, null));
     }
 
 }

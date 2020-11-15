@@ -13,15 +13,18 @@
 package org.talend.components.assertion.service;
 
 import org.talend.components.assertion.conf.Config;
+import org.talend.sdk.component.api.record.Record;
 
 import java.math.BigDecimal;
 
-public class NumberValidator implements Validator {
+public abstract class NumberValidator extends Validator<Number> {
 
     @Override
-    public boolean validate(Config.Condition condition, String expected, Object value) {
+    public boolean validate(Config.Condition condition, String expected, Number value, Record record) {
         BigDecimal bdExcpeted = new BigDecimal(expected);
         BigDecimal bdValue = new BigDecimal("" + value);
+
+        this.checkType(value);
 
         int compare = bdValue.compareTo(bdExcpeted);
 
@@ -35,6 +38,8 @@ public class NumberValidator implements Validator {
         default:
             throw new UnsupportedOperationException("Unspported number condition : " + condition);
         }
-
     }
+
+    abstract boolean checkType(Object value);
+
 }

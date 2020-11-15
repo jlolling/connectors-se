@@ -33,25 +33,25 @@ class DateValidatorTest {
     @Test
     public void valideStringEquals() {
         String value = "2020/10/01 00:06:00+02";
-        assertTrue(validator.validate(Config.Condition.EQUALS, expected, value));
-        assertFalse(validator.validate(Config.Condition.INFERIOR, expected, value));
-        assertFalse(validator.validate(Config.Condition.SUPERIOR, expected, value));
+        assertTrue(validator.validate(Config.Condition.EQUALS, expected, value, null));
+        assertFalse(validator.validate(Config.Condition.INFERIOR, expected, value, null));
+        assertFalse(validator.validate(Config.Condition.SUPERIOR, expected, value, null));
     }
 
     @Test
     public void valideStringSuperior() {
         String value = "2020/10/01 00:06:01+02";
-        assertFalse(validator.validate(Config.Condition.EQUALS, expected, value));
-        assertFalse(validator.validate(Config.Condition.INFERIOR, expected, value));
-        assertTrue(validator.validate(Config.Condition.SUPERIOR, expected, value));
+        assertFalse(validator.validate(Config.Condition.EQUALS, expected, value, null));
+        assertFalse(validator.validate(Config.Condition.INFERIOR, expected, value, null));
+        assertTrue(validator.validate(Config.Condition.SUPERIOR, expected, value, null));
     }
 
     @Test
     public void valideStringInferior() {
         String value = "2020/10/01 00:05:59+02";
-        assertFalse(validator.validate(Config.Condition.EQUALS, expected, value));
-        assertTrue(validator.validate(Config.Condition.INFERIOR, expected, value));
-        assertFalse(validator.validate(Config.Condition.SUPERIOR, expected, value));
+        assertFalse(validator.validate(Config.Condition.EQUALS, expected, value, null));
+        assertTrue(validator.validate(Config.Condition.INFERIOR, expected, value, null));
+        assertFalse(validator.validate(Config.Condition.SUPERIOR, expected, value, null));
     }
 
     @Test
@@ -61,8 +61,8 @@ class DateValidatorTest {
         String value = "30-09-2020 | 05:00:59Z";
 
         validator.setFormat(format);
-        assertFalse(validator.validate(Config.Condition.EQUALS, expected, value));
-        assertTrue(validator.validate(Config.Condition.INFERIOR, expected, value));
-        assertFalse(validator.validate(Config.Condition.SUPERIOR, expected, value));
+        assertFalse(validator.validate(Config.Condition.EQUALS, expected, value, null));
+        assertTrue(validator.validate(Config.Condition.INFERIOR, expected, value, null));
+        assertFalse(validator.validate(Config.Condition.SUPERIOR, expected, value, null));
     }
 }

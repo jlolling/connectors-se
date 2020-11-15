@@ -12,13 +12,10 @@
  */
 package org.talend.components.assertion.service;
 
-import org.talend.components.assertion.conf.Config;
-import org.talend.sdk.component.api.record.Record;
-
-public class NullValidator extends Validator<Object> {
+public class IntegerValidator extends NumberValidator {
 
     @Override
-    public boolean validate(final Config.Condition condition, final String expected, final Object value, Record record) {
-        return value == null;
+    boolean checkType(Object value) {
+        return value instanceof Integer;
     }
 }
