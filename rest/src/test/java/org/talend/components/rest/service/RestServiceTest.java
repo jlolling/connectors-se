@@ -76,8 +76,8 @@ public class RestServiceTest {
         config.getDataset().setHasHeaders(false);
 
         List<String[]> paramList = new ArrayList<>();
-        paramList.add(new String[] { "leads", "124", "name" });
-        paramList.add(new String[] { "{leads}", "{124}", "{name}" });
+        paramList.add(new String[]{"leads", "124", "name"});
+        paramList.add(new String[]{"{leads}", "{124}", "{name}"});
 
         for (String[] params : paramList) {
             List<Param> pathParams = new ArrayList<>();
@@ -134,10 +134,10 @@ public class RestServiceTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = { "http://www.domain.com,,http://www.domain.com", "http://www.domain.com/,,http://www.domain.com/",
+    @CsvSource(value = {"http://www.domain.com,,http://www.domain.com", "http://www.domain.com/,,http://www.domain.com/",
             "http://www.domain.com,get,http://www.domain.com/get", "http://www.domain.com/,get,http://www.domain.com/get",
             "http://www.domain.com,/get,http://www.domain.com/get",
-            "   http://www.domain.com/ ,  /get ,http://www.domain.com//get", })
+            "   http://www.domain.com/ ,  /get ,http://www.domain.com//get",})
     void buildUrl(final String base, final String resource, final String expected) {
         config.getDataset().getDatastore().setBase(base);
         config.getDataset().setResource(resource == null ? "   " : resource);
@@ -232,11 +232,76 @@ public class RestServiceTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = { "https://this.is.my.host.com/api/v1,https://this.is.my.host.com",
+    @CsvSource(value = {"https://this.is.my.host.com/api/v1,https://this.is.my.host.com",
             "http://www.mysite.org/a/page,http://www.mysite.org", "https://www.mysite.com?v=param,https://www.mysite.com",
-            "https://www.mysite.com/this/is/page.html,https://www.mysite.com" })
+            "https://www.mysite.com/this/is/page.html,https://www.mysite.com"})
     void getHost(final String baseUrl, final String host) throws MalformedURLException {
         assertEquals(host, service.getHost(baseUrl));
     }
 
+
+    @ParameterizedTest
+    @CsvSource(value = { //
+            // Forbidden address if connectors.enable_local_network_access == true
+            // loopback address
+            "http://127.0.0.1/my/api, false, false", //
+            "http://127.0.0.1/my/api, true, true", //
+            "http://127.0.0.1:80/my/api, false, false", //
+            "http://127.0.0.1:80/my/api, true, true", //
+            "http://localhost/my/api, false, false", //
+            "http://localhost/my/api, true, true", //
+            "http://myapp.localhost.com:80/my/api, false, false", //
+            "http://myapp.localhost.com:80/my/api, true, true", //
+            // RFC1918 / Private Address Space : https://tools.ietf.org/html/rfc1918
+            "http://10.0.0.0/my/api, false, false", //
+            "http://10.0.0.0/my/api, true, true", //
+            "http://10.10.0.0/my/api, false, false", //
+            "http://10.10.0.0/my/api, true, true", //
+            "http://10.10.10.0/my/api, false, false", //
+            "http://10.10.10.0/my/api, true, true", //
+            "http://10.10.10.10/my/api, false, false", //
+            "http://10.10.10.10/my/api, true, true", //
+            "http://10.255.255.255/my/api, false, false", //
+            "http://10.255.255.255/my/api, true, true", //
+            "http://172.16.0.0/my/api, false, false", //
+            "http://172.16.0.0/my/api, true, true", //
+            "http://172.16.255.0/my/api, false, false", //
+            "http://172.16.255.0/my/api, true, true", //
+            "http://172.25.25.25/my/api, false, false", //
+            "http://172.25.25.25/my/api, true, true", //
+            "http://172.31.0.0/my/api, false, false", //
+            "http://172.31.0.0/my/api, true, true", //
+            "http://172.31.0.255/my/api, false, false", //
+            "http://172.31.0.255/my/api, true, true", //
+            "http://192.168.0.0/my/api, false, false", //
+            "http://192.168.0.0/my/api, true, true", //
+            "http://192.168.128.10/my/api, false, false", //
+            "http://192.168.128.10/my/api, true, true", //
+            "http://192.168.255.255/my/api, false, false", //
+            "http://192.168.255.255/my/api, true, true", //
+            // Address found by pentesters
+            "https://172.18.0.7/my/api, false, false", //
+            "https://172.18.0.7/my/api, true, true", //
+            // 	Multicast / Local subnetwork : https://en.wikipedia.org/wiki/Multicast_address
+            "http://224.0.0.128:80/my/api, false, false", //
+            "http://224.0.0.128:80/my/api, true, true", //
+            "http://224.0.0.1:80/my/api, false, false", //
+            "http://224.0.0.1:80/my/api, true, true", //
+            "http://224.0.0.255:80/my/api, false, false", //
+            "http://224.0.0.255:80/my/api, true, true", //
+            //
+            // Authorised addresses even if connectors.enable_local_network_access == true (external sites)
+            "http://233.0.0.128:80/my/api, false, true", //
+            "http://233.0.0.128:80/my/api, true, true", //
+            "http://233.0.0.1:80/my/api, false, true", //
+            "http://233.0.0.1:80/my/api, true, true", //
+            "http://233.0.0.255:80/my/api, false, true", //
+            "http://233.0.0.255:80/my/api, true, true", //
+            "http://www.external.com/my/api, false, true", //
+            "http://www.external.com/my/api, true, true" //
+    })
+    void valideSite(final String url, final boolean canAccessLocal, final boolean expected) {
+        final boolean validSite = service.isValidSite(url, canAccessLocal);
+        assertEquals(expected, validSite);
+    }
 }
