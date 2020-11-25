@@ -78,6 +78,7 @@
                     <systemPropertyVariables>
                         <talend.component.junit.handler.state>static</talend.component.junit.handler.state>
                         <talend.junit.beam.version>${beam.version}</talend.junit.beam.version>
+                        <connectors.enable_local_network_access>true</connectors.enable_local_network_access>
                     </systemPropertyVariables>
                     <excludedGroups>${test.excluded}</excludedGroups>
                 </configuration>

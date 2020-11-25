@@ -16,6 +16,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.talend.components.common.service.http.RedirectContext;
 import org.talend.components.common.service.http.RedirectService;
+import org.talend.components.common.service.http.ValidateSites;
 import org.talend.components.common.service.http.common.UserNamePassword;
 import org.talend.components.common.service.http.digest.DigestAuthContext;
 import org.talend.components.common.service.http.digest.DigestAuthService;
@@ -56,13 +57,6 @@ import static java.util.stream.Collectors.toMap;
 @Data
 @Service
 public class RestService {
-
-
-    private final static boolean CAN_ACCESS_LOCAL = Boolean
-            .valueOf(System.getProperty("connectors.enable_local_network_access", "false"));
-
-    private final static List<String> ADDITIONAL_LOCAL_HOSTS = Arrays.asList(new String[]{"224.0.0" // local multicast : from 224.0.0.0 to 224.0.0.255
-            , "127.0.0.1", "localhost"});
 
     private final static String PARAMETERS_SUBSTITUTOR_PREFIX = System
             .getProperty("org.talend.components.rest.parameters_substitutor_prefix", "{");
@@ -107,7 +101,7 @@ public class RestService {
         final RecordDictionary dictionary = new RecordDictionary(record, recordPointerFactory);
         final Substitutor substitutor = new Substitutor(parameterFinder, dictionary);
 
-        if (!isValidSite(config.getDataset().getDatastore().getBase(), CAN_ACCESS_LOCAL)) {
+        if (!ValidateSites.isValidSite(config.getDataset().getDatastore().getBase())) {
             throw new RuntimeException(i18n.cantAccessLocal());
         }
 
@@ -144,8 +138,8 @@ public class RestService {
     }
 
     private Response<InputStream> call(final RequestConfig config, final Map<String, String> headers,
-                                       final Map<String, String> queryParams, final Body body, final String surl,
-                                       final RedirectContext previousRedirectContext) {
+            final Map<String, String> queryParams, final Body body, final String surl,
+            final RedirectContext previousRedirectContext) {
 
         Response<InputStream> resp = null;
 
@@ -159,7 +153,7 @@ public class RestService {
                     DigestAuthService das = new DigestAuthService();
                     DigestAuthContext context = new DigestAuthContext(url.getPath(), config.getDataset().getMethodType().name(),
                             url.getHost(), url.getPort(), body == null ? null : body.getContent(), new UserNamePassword(
-                            authentication.getBasic().getUsername(), authentication.getBasic().getPassword()));
+                                    authentication.getBasic().getUsername(), authentication.getBasic().getPassword()));
                     resp = das.call(context, () -> client.executeWithDigestAuth(i18n, context, config, client,
                             previousRedirectContext.getMethod(), surl, headers, queryParams, body));
                 } catch (MalformedURLException e) {
@@ -277,23 +271,6 @@ public class RestService {
         }
 
         return params.stream().map(Param::getKey).distinct().count() >= params.size();
-    }
-
-    public boolean isValidSite(final String base, final boolean can_access_local) {
-        if (can_access_local) {
-            // we can access all sites
-            return true;
-        }
-
-        try {
-            final URL url = new URL(base);
-            final String host = url.getHost();
-            final InetAddress inetAddress = Inet4Address.getByName(host);
-
-            return !inetAddress.isSiteLocalAddress() && !ADDITIONAL_LOCAL_HOSTS.stream().filter(h -> host.contains(h)).findFirst().isPresent();
-        } catch (MalformedURLException | UnknownHostException e) {
-            return false;
-        }
     }
 
 }
