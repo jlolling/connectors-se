@@ -28,10 +28,9 @@ public class ValidateSites {
     private final static boolean DISABLE_MULTICAST_ACCESS = Boolean
             .valueOf(System.getProperty("connectors.disable_multicast_network_access", "true"));
 
-    private final static List<String> ADDITIONAL_LOCAL_HOSTS = Arrays.asList(new String[]{"224.0.0" // local multicast : from
+    private final static List<String> ADDITIONAL_LOCAL_HOSTS = Arrays.asList(new String[] { "224.0.0" // local multicast : from
             // 224.0.0.0 to 224.0.0.255
-            , "127.0.0.1", "localhost"});
-
+            , "127.0.0.1", "localhost" });
 
     private ValidateSites() {
     }
@@ -40,9 +39,18 @@ public class ValidateSites {
         return isValidSite(base, CAN_ACCESS_LOCAL, DISABLE_MULTICAST_ACCESS);
     }
 
-    public static boolean isValidSite(final String base, final boolean can_access_local, final boolean disable_multicat_access) {
+    /**
+     * This method returns if the given url is valid depending of paremeter.
+     * We can make local sites and multicast class of addresses invalid.
+     *
+     * @param surl
+     * @param can_access_local
+     * @param disable_multicat_access
+     * @return
+     */
+    public static boolean isValidSite(final String surl, final boolean can_access_local, final boolean disable_multicat_access) {
         try {
-            final URL url = new URL(base);
+            final URL url = new URL(surl);
             final String host = url.getHost();
             final InetAddress inetAddress = Inet4Address.getByName(host);
 
