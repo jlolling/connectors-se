@@ -22,11 +22,11 @@ import java.util.List;
 
 public class ValidateSites {
 
-    private final static boolean CAN_ACCESS_LOCAL = Boolean
+    public final static boolean CAN_ACCESS_LOCAL = Boolean
             .valueOf(System.getProperty("connectors.enable_local_network_access", "false"));
 
-    private final static boolean DISABLE_MULTICAST_ACCESS = Boolean
-            .valueOf(System.getProperty("connectors.disable_multicast_network_access", "true"));
+    public final static boolean ENABLE_MULTICAST_ACCESS = Boolean
+            .valueOf(System.getProperty("connectors.enable_multicast_network_access", "false"));
 
     private final static List<String> ADDITIONAL_LOCAL_HOSTS = Arrays.asList(new String[] { "224.0.0" // local multicast : from
             // 224.0.0.0 to 224.0.0.255
@@ -36,7 +36,7 @@ public class ValidateSites {
     }
 
     public static boolean isValidSite(final String base) {
-        return isValidSite(base, CAN_ACCESS_LOCAL, DISABLE_MULTICAST_ACCESS);
+        return isValidSite(base, CAN_ACCESS_LOCAL, ENABLE_MULTICAST_ACCESS);
     }
 
     /**
@@ -45,16 +45,16 @@ public class ValidateSites {
      *
      * @param surl
      * @param can_access_local
-     * @param disable_multicat_access
+     * @param enable_multicat_access
      * @return
      */
-    public static boolean isValidSite(final String surl, final boolean can_access_local, final boolean disable_multicat_access) {
+    public static boolean isValidSite(final String surl, final boolean can_access_local, final boolean enable_multicat_access) {
         try {
             final URL url = new URL(surl);
             final String host = url.getHost();
             final InetAddress inetAddress = Inet4Address.getByName(host);
 
-            if (disable_multicat_access && inetAddress.isMulticastAddress()) {
+            if (!enable_multicat_access && inetAddress.isMulticastAddress()) {
                 // Multicast addresses are forbidden
                 return false;
             }

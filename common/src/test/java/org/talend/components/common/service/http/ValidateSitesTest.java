@@ -62,63 +62,63 @@ class ValidateSitesTest {
             "https://172.18.0.7/my/api, false, false, false", //
             "https://172.18.0.7/my/api, true, false, true", //
             // Multicast / Local subnetwork : https://en.wikipedia.org/wiki/Multicast_address
-            "http://224.0.0.128:80/my/api, false, false, false", //
-            "http://224.0.0.128:80/my/api, true, false, true", //
-            "http://224.0.0.1:80/my/api, false, false, false", //
-            "http://224.0.0.1:80/my/api, true, false, true", //
-            "http://224.0.0.255:80/my/api, false, false, false", //
-            "http://224.0.0.255:80/my/api, true, false, true", //
+            "http://224.0.0.128:80/my/api, false, true, false", //
+            "http://224.0.0.128:80/my/api, true, true, true", //
+            "http://224.0.0.1:80/my/api, false, true, false", //
+            "http://224.0.0.1:80/my/api, true, true, true", //
+            "http://224.0.0.255:80/my/api, false, true, false", //
+            "http://224.0.0.255:80/my/api, true, true, true", //
             //
             // Authorised addresses even if connectors.enable_local_network_access == true (external sites)
-            "http://233.0.0.128:80/my/api, false, false, true", //
-            "http://233.0.0.128:80/my/api, true, false, true", //
-            "http://233.0.0.1:80/my/api, false, false, true", //
-            "http://233.0.0.1:80/my/api, true, false, true", //
-            "http://233.0.0.255:80/my/api, false, false, true", //
-            "http://233.0.0.255:80/my/api, true, false, true", //
+            "http://233.0.0.128:80/my/api, false, true, true", //
+            "http://233.0.0.128:80/my/api, true, true, true", //
+            "http://233.0.0.1:80/my/api, false, true, true", //
+            "http://233.0.0.1:80/my/api, true, true, true", //
+            "http://233.0.0.255:80/my/api, false, true, true", //
+            "http://233.0.0.255:80/my/api, true, true, true", //
             "http://www.external.com/my/api, false, false, true", //
             "http://www.external.com/my/api, true, false, true", //
             //
             // Check if we disable multicast : https://en.wikipedia.org/wiki/Multicast_address
-            "http://224.0.1.0:80/my/api, false, false, true", //
-            "http://224.0.1.0:80/my/api, false, true, false", //
-            "http://224.0.1.255:80/my/api, false, false, true", //
-            "http://224.0.1.255:80/my/api, false, true, false", //
+            "http://224.0.1.0:80/my/api, false, false, false", //
+            "http://224.0.1.0:80/my/api, false, true, true", //
+            "http://224.0.1.255:80/my/api, false, false, false", //
+            "http://224.0.1.255:80/my/api, false, true, true", //
             //
-            "http://224.0.2.0:80/my/api, false, false, true", //
-            "http://224.0.2.0:80/my/api, false, true, false", //
-            "http://224.0.255.255:80/my/api, false, false, true", //
-            "http://224.0.255.255:80/my/api, false, true, false", //
+            "http://224.0.2.0:80/my/api, false, false, false", //
+            "http://224.0.2.0:80/my/api, false, true, true", //
+            "http://224.0.255.255:80/my/api, false, false, false", //
+            "http://224.0.255.255:80/my/api, false, true, true", //
             //
-            "http://224.3.0.0:80/my/api, false, false, true", //
-            "http://224.3.0.0:80/my/api, false, true, false", //
-            "http://224.4.255.255:80/my/api, false, false, true", //
-            "http://224.4.255.255:80/my/api, false, true, false", //
+            "http://224.3.0.0:80/my/api, false, false, false", //
+            "http://224.3.0.0:80/my/api, false, true, true", //
+            "http://224.4.255.255:80/my/api, false, false, false", //
+            "http://224.4.255.255:80/my/api, false, true, true", //
             //
-            "http://232.0.0.0:80/my/api, false, false, true", //
-            "http://232.0.0.0:80/my/api, false, true, false", //
-            "http://232.255.255.255:80/my/api, false, false, true", //
-            "http://232.255.255.255:80/my/api, false, true, false", //
+            "http://232.0.0.0:80/my/api, false, false, false", //
+            "http://232.0.0.0:80/my/api, false, true, true", //
+            "http://232.255.255.255:80/my/api, false, false, false", //
+            "http://232.255.255.255:80/my/api, false, true, true", //
             //
-            "http://233.0.0.0:80/my/api, false, false, true", //
-            "http://233.0.0.0:80/my/api, false, true, false", //
-            "http://233.251.255.255:80/my/api, false, false, true", //
-            "http://233.251.255.255:80/my/api, false, true, false", //
+            "http://233.0.0.0:80/my/api, false, false, false", //
+            "http://233.0.0.0:80/my/api, false, true, true", //
+            "http://233.251.255.255:80/my/api, false, false, false", //
+            "http://233.251.255.255:80/my/api, false, true, true", //
             //
-            "http://233.252.0.0:80/my/api, false, false, true", //
-            "http://233.252.0.0:80/my/api, false, true, false", //
-            "http://233.252.255.255:80/my/api, false, false, true", //
-            "http://233.255.255.255:80/my/api, false, true, false", //
+            "http://233.252.0.0:80/my/api, false, false, false", //
+            "http://233.252.0.0:80/my/api, false, true, true", //
+            "http://233.252.255.255:80/my/api, false, false, false", //
+            "http://233.255.255.255:80/my/api, false, true, true", //
             //
-            "http://234.0.0.0:80/my/api, false, false, true", //
-            "http://234.0.0.0:80/my/api, false, true, false", //
-            "http://234.255.255.255:80/my/api, false, false, true", //
-            "http://234.255.255.255:80/my/api, false, true, false", //
+            "http://234.0.0.0:80/my/api, false, false, false", //
+            "http://234.0.0.0:80/my/api, false, true, true", //
+            "http://234.255.255.255:80/my/api, false, false, false", //
+            "http://234.255.255.255:80/my/api, false, true, true", //
             //
-            "http://239.0.0.0:80/my/api, false, false, true", //
-            "http://239.0.0.0:80/my/api, false, true, false", //
-            "http://239.255.255.255:80/my/api, false, false, true", //
-            "http://239.255.255.255:80/my/api, false, true, false" //
+            "http://239.0.0.0:80/my/api, false, false, false", //
+            "http://239.0.0.0:80/my/api, false, true, true", //
+            "http://239.255.255.255:80/my/api, false, false, false", //
+            "http://239.255.255.255:80/my/api, false, true, true" //
     })
     void valideSite(final String url, final boolean canAccessLocal, final boolean disableMulticast, final boolean expected) {
         final boolean validSite = ValidateSites.isValidSite(url, canAccessLocal, disableMulticast);

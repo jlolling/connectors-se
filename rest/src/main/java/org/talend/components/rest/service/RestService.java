@@ -41,13 +41,9 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.HttpURLConnection;
-import java.net.Inet4Address;
-import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
-import java.net.UnknownHostException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -102,7 +98,8 @@ public class RestService {
         final Substitutor substitutor = new Substitutor(parameterFinder, dictionary);
 
         if (!ValidateSites.isValidSite(config.getDataset().getDatastore().getBase())) {
-            throw new RuntimeException(i18n.cantAccessLocal());
+            throw new RuntimeException(
+                    i18n.notValidAddress(ValidateSites.CAN_ACCESS_LOCAL, ValidateSites.ENABLE_MULTICAST_ACCESS));
         }
 
         // Check if there are some duplicate keys in given parameters
