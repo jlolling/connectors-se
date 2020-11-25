@@ -25,27 +25,36 @@ public class ValidateSites {
     private final static boolean CAN_ACCESS_LOCAL = Boolean
             .valueOf(System.getProperty("connectors.enable_local_network_access", "false"));
 
-    private final static List<String> ADDITIONAL_LOCAL_HOSTS = Arrays.asList(new String[] { "224.0.0" // local multicast : from
-                                                                                                      // 224.0.0.0 to 224.0.0.255
-            , "127.0.0.1", "localhost" });
+    private final static boolean DISABLE_MULTICAST_ACCESS = Boolean
+            .valueOf(System.getProperty("connectors.disable_multicast_network_access", "true"));
+
+    private final static List<String> ADDITIONAL_LOCAL_HOSTS = Arrays.asList(new String[]{"224.0.0" // local multicast : from
+            // 224.0.0.0 to 224.0.0.255
+            , "127.0.0.1", "localhost"});
+
 
     private ValidateSites() {
     }
 
     public static boolean isValidSite(final String base) {
-        return isValidSite(base, CAN_ACCESS_LOCAL);
+        return isValidSite(base, CAN_ACCESS_LOCAL, DISABLE_MULTICAST_ACCESS);
     }
 
-    public static boolean isValidSite(final String base, final boolean can_access_local) {
-        if (can_access_local) {
-            // we can access all sites
-            return true;
-        }
-
+    public static boolean isValidSite(final String base, final boolean can_access_local, final boolean disable_multicat_access) {
         try {
             final URL url = new URL(base);
             final String host = url.getHost();
             final InetAddress inetAddress = Inet4Address.getByName(host);
+
+            if (disable_multicat_access && inetAddress.isMulticastAddress()) {
+                // Multicast addresses are forbidden
+                return false;
+            }
+
+            if (can_access_local) {
+                // we can access local sites
+                return true;
+            }
 
             return !inetAddress.isSiteLocalAddress()
                     && !ADDITIONAL_LOCAL_HOSTS.stream().filter(h -> host.contains(h)).findFirst().isPresent();
