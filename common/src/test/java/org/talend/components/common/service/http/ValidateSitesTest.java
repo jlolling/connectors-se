@@ -29,8 +29,8 @@ class ValidateSitesTest {
             "http://127.0.0.1:80/my/api, true, false, true", //
             "http://localhost/my/api, false, false, false", //
             "http://localhost/my/api, true, false, true", //
-            "http://myapp.localhost.com:80/my/api, false, false, false", //
-            // "http://myapp.localhost.com:80/my/api, true, false, true", //
+            "http://myapp.localhost.com:80/my/api, false, false, true", //
+            "http://myapp.localhost.com:80/my/api, true, false, true", //
             // RFC1918 / Private Address Space : https://tools.ietf.org/html/rfc1918
             "http://10.0.0.0/my/api, false, false, false", //
             "http://10.0.0.0/my/api, true, false, true", //

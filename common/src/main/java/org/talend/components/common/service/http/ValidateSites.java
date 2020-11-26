@@ -20,6 +20,9 @@ import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class ValidateSites {
 
     public final static boolean CAN_ACCESS_LOCAL = Boolean.valueOf(System.getProperty("connectors.enable_local_network_access",
@@ -29,7 +32,7 @@ public class ValidateSites {
             .valueOf(System.getProperty("connectors.enable_multicast_network_access",
                     System.getenv().getOrDefault("CONNECTORS_ENABLE_MULTICAST_NETWORK_ACCESS", "true")));
 
-    private final static List<String> ADDITIONAL_LOCAL_HOSTS = Arrays.asList(new String[] { "224.0.0" // local multicast : from
+    private final static List<String> ADDITIONAL_LOCAL_HOSTS = Arrays.asList(new String[] { "224.0.0." // local multicast : from
             // 224.0.0.0 to 224.0.0.255
             , "127.0.0.1", "localhost" });
 
@@ -67,8 +70,11 @@ public class ValidateSites {
 
             return !inetAddress.isSiteLocalAddress()
                     && !ADDITIONAL_LOCAL_HOSTS.stream().filter(h -> host.contains(h)).findFirst().isPresent();
-        } catch (MalformedURLException | UnknownHostException e) {
+        } catch (MalformedURLException e) {
+            log.error(e.getMessage(), e);
             return false;
+        } catch (UnknownHostException e) {
+            return true;
         }
     }
 }
