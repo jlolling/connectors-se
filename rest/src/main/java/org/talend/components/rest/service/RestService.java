@@ -102,11 +102,6 @@ public class RestService {
         final RecordDictionary dictionary = new RecordDictionary(record, recordPointerFactory);
         final Substitutor substitutor = new Substitutor(parameterFinder, dictionary);
 
-        if (!ValidateSites.isValidSite(config.getDataset().getDatastore().getBase())) {
-            throw new RuntimeException(
-                    i18n.notValidAddress(ValidateSites.CAN_ACCESS_LOCAL, ValidateSites.ENABLE_MULTICAST_ACCESS));
-        }
-
         // Check if there are some duplicate keys in given parameters
         if (!hasNoDuplicates(config.getDataset().getHeaders())) {
             throw new IllegalStateException(i18n.duplicateKeys(i18n.headers()));
@@ -259,12 +254,19 @@ public class RestService {
     }
 
     @AsyncValidation(ACTION_VALIDATION_BASE_URL)
-    public ValidationResult validateReadOnlySQLQuery(final String base) {
+    public ValidationResult validateBaseURL(final String base) {
         if (!ValidateSites.isValidSite(base)) {
             return new ValidationResult(ValidationResult.Status.KO,
                     i18n.notValidAddress(ValidateSites.CAN_ACCESS_LOCAL, ValidateSites.ENABLE_MULTICAST_ACCESS));
         }
         return new ValidationResult(ValidationResult.Status.OK, "The base URL is valid.");
+    }
+
+    public void checkBaseURL(final String base) {
+        if (!ValidateSites.isValidSite(base)) {
+            throw new RuntimeException(
+                    i18n.notValidAddress(ValidateSites.CAN_ACCESS_LOCAL, ValidateSites.ENABLE_MULTICAST_ACCESS));
+        }
     }
 
     public String getHost(final String baseUrl) throws MalformedURLException {

@@ -49,16 +49,16 @@ public class ValidateSites {
      *
      * @param surl
      * @param can_access_local
-     * @param enable_multicat_access
+     * @param enable_multicast_access
      * @return
      */
-    public static boolean isValidSite(final String surl, final boolean can_access_local, final boolean enable_multicat_access) {
+    public static boolean isValidSite(final String surl, final boolean can_access_local, final boolean enable_multicast_access) {
         try {
             final URL url = new URL(surl);
             final String host = url.getHost();
             final InetAddress inetAddress = Inet4Address.getByName(host);
 
-            if (!enable_multicat_access && inetAddress.isMulticastAddress()) {
+            if (!enable_multicast_access && inetAddress.isMulticastAddress()) {
                 // Multicast addresses are forbidden
                 return false;
             }

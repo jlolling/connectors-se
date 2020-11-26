@@ -12,6 +12,7 @@
  */
 package org.talend.components.rest.source;
 
+import org.talend.components.common.service.http.ValidateSites;
 import org.talend.components.extension.polling.api.Pollable;
 import org.talend.components.rest.configuration.RequestConfig;
 import org.talend.components.rest.service.CompletePayload;
@@ -25,6 +26,7 @@ import org.talend.sdk.component.api.input.Producer;
 import org.talend.sdk.component.api.meta.Documentation;
 import org.talend.sdk.component.api.record.Record;
 
+import javax.annotation.PostConstruct;
 import javax.json.JsonStructure;
 import javax.json.JsonValue;
 import java.io.Serializable;
@@ -57,6 +59,11 @@ public class RestEmitter implements Serializable {
         this.config = config;
         this.client = client;
         this.recordBuilder = recordBuilder;
+    }
+
+    @PostConstruct
+    public void init() {
+        client.checkBaseURL(config.getDataset().getDatastore().getBase());
     }
 
     @Producer
