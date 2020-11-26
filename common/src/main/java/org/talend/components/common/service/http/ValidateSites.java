@@ -22,11 +22,12 @@ import java.util.List;
 
 public class ValidateSites {
 
-    public final static boolean CAN_ACCESS_LOCAL = Boolean
-            .valueOf(System.getProperty("connectors.enable_local_network_access", "false"));
+    public final static boolean CAN_ACCESS_LOCAL = Boolean.valueOf(System.getProperty("connectors.enable_local_network_access",
+            System.getenv().getOrDefault("CONNECTORS_ENABLE_LOCAL_NETWORK_ACCESS", "true")));
 
     public final static boolean ENABLE_MULTICAST_ACCESS = Boolean
-            .valueOf(System.getProperty("connectors.enable_multicast_network_access", "false"));
+            .valueOf(System.getProperty("connectors.enable_multicast_network_access",
+                    System.getenv().getOrDefault("CONNECTORS_ENABLE_MULTICAST_NETWORK_ACCESS", "true")));
 
     private final static List<String> ADDITIONAL_LOCAL_HOSTS = Arrays.asList(new String[] { "224.0.0" // local multicast : from
             // 224.0.0.0 to 224.0.0.255
